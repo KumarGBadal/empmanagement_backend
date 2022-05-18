@@ -1,37 +1,30 @@
-const express = require('express')
-const mongoose = require('mongoose')
-const apiroute = require('./routes/auth')
-const cors = require('cors')
-const dotenv = ('dotenv')
+const express = require("express");
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
+const cors = require("cors");
 
+const routes = require("./routes/routes");
 
+const app = express();
+dotenv.config();
 
+app.get("/", (req, res) => {
+  res.send("App running");
+});
 
-//Initialize the applications
-const app = express()
+const port = 8080 ;
 
-//setup server port
-const port = 8080
+app.listen(port, () => {
+  console.log(`App running on port ${port}`);
+});
 
-app.get("/", (req, res)=>{
-    res.send("running app")
-})
+mongoose
+  .connect(process.env.DB_CONNECT, { useNewUrlParser: true })
+  .then(() => {
+    console.log("Database connected");
+  })
+  .catch((error) => console.log(error));
 
-app.use(express.json(),cors())
+app.use(express.json(), cors());
 
-//send message for your localhost
-app.use('./api/users', apiroute)
-
-dotenv.config()
-
-mongoose.connect(process.env.DB_CONNECT, {useNewUrlParser:true})
-.then(()=>{
-    console.log('database Connected')
-}).catch(err => console.log(err))
-
-//Launch the backend app
-
-app.listen(port, ()=>{
-    console.log(`running app on port: 'http://localhost:$(port)/`)
-})
-
+app.use("/", routes);
